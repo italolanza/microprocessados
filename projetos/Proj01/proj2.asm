@@ -94,7 +94,7 @@ TECLADO_READ:
     TR17: LJMP TECLADO_SAIR
 
     ;Esta rotina evita repetição de teclas TECLADO_SAIR:
-    PUSH ACC
+    TECLADO_SAIR: PUSH ACC
     MOV A,#80H
     MOV DPTR,#TECLADO MOVX @DPTR,A
 
