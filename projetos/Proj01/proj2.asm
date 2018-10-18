@@ -79,7 +79,7 @@ TECLADO_READ:
     TR17: LJMP TECLADO_SAIR
     CJNE R1, #00000000, TECLADO_READ
     ; aqui devo fazer o display apareceer o numero
-    
+
     LJMP TECLADO_READ
 
     ;Esta rotina evita repetição de teclas
