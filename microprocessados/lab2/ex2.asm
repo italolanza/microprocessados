@@ -2,73 +2,90 @@ teclado equ 0ffe3h
 motor equ 0ffe6h 
 en_display equ 0ffe1h 
 dados_display equ 0ffe0h
-org 0h 
+
+org 0h
+
 clr a 
 mov p1,a ;apagando leds em p1 
 mov a,#00h ;zerando o motor.... 
-mov dptr,#motor ;(evitar aquecimento movx @dptr,a ;e ruÌdo!!)
+mov dptr,#motor ;(evitar aquecimento movx @dptr,a ;e ru√≠do!!)
 
-;Mostra 9
-mov a,#08h				;ativa display mais a direita (D30)
+;Mostra 6
+mov a,#08h				;ativa display das unidades (D30)
 mov dptr,#en_display	;envia endereco de habilitacao do display para o dptr
 movx @dptr,a			;envia 08h, habilitando o display D30 
-mov r0,#6				;para apontar o primeiro dado da tabela
+mov r0,#6				;para apontar o 6 dado da tabela
 ;tabela
 mov a,r0
 mov dptr, #tabela
 movc a,@a+dptr ;envia dados para o display
 mov dptr,#dados_display	;envia o dados para display para dptr 
 movx @dptr,a
+
+clr a
 ;Mostra 5
-mov a,#04h				;ativa display mais a direita (D30)
+mov a,#04h				;ativa display das dezenas (D20)
 mov dptr,#en_display	;envia endereco de habilitacao do display para o dptr
-movx @dptr,a			;envia 08h, habilitando o display D30 
-mov r1,#5				;para apontar o primeiro dado da tabela
+movx @dptr,a			;envia 08h, habilitando o display D20 
+mov r1,#5				;para apontar o 5 dado da tabela
 ;tabela
 mov a,r1
 mov dptr, #tabela
 movc a,@a+dptr ;envia dados para o display
 mov dptr,#dados_display	;envia o dados para display para dptr 
 movx @dptr,a
- 
+clr a
+
 inicio: 
 ;############## teclado ############### 
-mov a,#40h ;ativa linha 7Q do IC4 (ver fig. anterior) 
-mov dptr,#teclado ;envia o endereÁo do teclado para dptr 
+mov a,#40h ;ativa linha 7Q do IC4 
+mov dptr,#teclado ;envia o endere√ßo do teclado para dptr 
 movx @dptr,a ;envia 40h para teclado 
-movx a,@dptr ;o que est· no endereÁo do teclado vai para acc 
+movx a,@dptr ;o que est√° no endere√ßo do teclado vai para acc 
 cjne a,#08h,prox ;pressionou tecla "+"? 
-cjne r0, #00010001b, incremente_unidade
+cjne r0, #00001001b, incremente_unidade ; r0 = 9 ? sim: move 0 para r0 incrementa r1, n√£o: incremente r0
 mov r0,#0
+
+cjne r1, #00001001b, incremente_dezena ; verifica se a dezena e 9
+mov r0, #0 ; caso sim, zera o display
+acall display ; chama rotina para escrever dados no display
+jmp sair ; Finaliza o processo
+
+incremente_dezena: ; Rotina para incrementar a dezena
 inc r1
-acall display
-jmp sair_positivo
+acall display ; chama rotina para escrever dados no display
+jmp sair ; Finaliza o processo
 
 
-incremente_unidade:
+incremente_unidade: ; Rotina para incrementar a unidade
 inc r0
-acall display
-
-sair_positivo:
-acall teclado_sair
+acall display ; chama rotina para escrever dados no display
+ljmp sair ; Finaliza o processo
 
 prox: 
 cjne a,#80h,sair ; pressionou tecla "-"? 
-cjne r0, #00000000b, decrementa_unidade
+cjne r0, #00000000b, decrementa_unidade ; verifica se a unidade e 0
 mov r0,#9
-dec r1
-acall display
-jmp sair
 
-decrementa_unidade:
+cjne r1, #00000000b, decrementa_dezena ; verifica se a dezena e 0
+mov r1, #9 ; caso sim, zera o display
+acall display ; chama rotina para escrever dados no display
+ljmp sair ; Finaliza o processo
+
+decrementa_dezena: ; Rotina para decrementar a dezena
+dec r1
+acall display ; chama rotina para escrever dados no display
+jmp sair ; Finaliza o processo
+
+decrementa_unidade: ; Rotina para decrementar unidade
 dec r0
-acall display
+acall display ; chama rotina para escrever dados no display
 
 sair: 
-acall teclado_sair 
+acall teclado_sair
 sjmp inicio 
 
-;####################################### ;esta rotina evita repetiÁ„o de teclas 
+;####################################### ;esta rotina evita repeti√ß√£o de teclas 
 teclado_sair: 
 push acc 
 mov a,#40h 
@@ -76,27 +93,30 @@ mov dptr,#teclado
 movx @dptr,a 
 teclado_repeat_2: 
 movx a,@dptr 
-cjne a,#00h,teclado_repeat_2;espera a tecla ser solta para que n„o ;gere varias ocorrencias da tecla 
+cjne a,#00h,teclado_repeat_2;espera a tecla ser solta para que n√£o ;gere varias ocorrencias da tecla 
 pop acc 
 ret
 
 display:
-mov a,#08h				;ativa display mais a direita (D30)
+clr a
+mov a,#08h				;ativa display das unidade (D30)
 mov dptr,#en_display	;envia endereco de habilitacao do display para o dptr
 movx @dptr,a			;envia 08h, habilitando o display D30 
 mov a,r0
 mov dptr, #tabela
 movc a,@a+dptr ;envia dados para o display
 mov dptr,#dados_display	;envia o dados para display para dptr 
-movx @dptr,a			;envia 3fh para display
-mov a,#04h				;ativa display mais a direita (D30)
+movx @dptr,a			;envia o valor do acumulador para display
+clr a
+mov a,#04h				;ativa display das dezenas (D20)
 mov dptr,#en_display	;envia endereco de habilitacao do display para o dptr
-movx @dptr,a			;envia 08h, habilitando o display D30 
+movx @dptr,a			;envia 04h, habilitando o display D20 
 mov a,r1
 mov dptr, #tabela
 movc a,@a+dptr ;envia dados para o display
 mov dptr,#dados_display	;envia o dados para display para dptr 
-movx @dptr,a			;envia 3fh para display
+movx @dptr,a			;envia o valor do acumulador para display
+clr a
 ret
 
 tabela:
