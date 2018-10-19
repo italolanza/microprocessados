@@ -1,3 +1,10 @@
+; Laboratorio 2 - Sistemas Microprocessados
+; 3Q2018 - 11/10/2018 - Grupo 5
+; Autores: Italo Milhomem de Abreu Lanza   RA:11039414 
+;          Joao Pedro Poloni Ponce         RA:11116513         
+;          Felipe Carlos Miguel Tignonsini RA: 11054613
+;          Nicolas de Oliveira Mizukami    RA: 11075314
+
 teclado equ 0ffe3h
 motor equ 0ffe6h 
 en_display equ 0ffe1h 
