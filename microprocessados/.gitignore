@@ -4,3 +4,9 @@
 *.c
 *.cpp
 *.h
+*.zip
+*.pdf
+*.doc
+*.docx
+*.ppt
+*.pttx
