@@ -165,67 +165,67 @@ ATUALIZA_DISPLAY:
     
     RET
     
-display:
-clr a
-mov a,#08h				;ativa display das unidade (D30)
-mov dptr,#EN_DIPSLAY	;envia endereco de habilitacao do display para o dptr
-movx @dptr,a			;envia 08h, habilitando o display D30 
-mov a,R0
-mov dptr, #tabela
-movc a,@a+dptr ;envia dados para o display
-mov dptr,#DADOS_DISPLAY	;envia o dados para display para dptr 
-movx @dptr,a			;envia o valor do acumulador para display
-clr a
-CALL TEMPO
-mov a,#04h				;ativa display das dezenas (D20)
-mov dptr,#EN_DIPSLAY	;envia endereco de habilitacao do display para o dptr
-movx @dptr,a			;envia 04h, habilitando o display D20 
-mov a,R1
-mov dptr, #tabela
-movc a,@a+dptr ;envia dados para o display
-mov dptr,#DADOS_DISPLAY	;envia o dados para display para dptr 
-movx @dptr,a			;envia o valor do acumulador para display
-clr a
-CALL TEMPO
-clr a
-mov a,#02h				;ativa display das unidade (D30)
-mov dptr,#EN_DIPSLAY	;envia endereco de habilitacao do display para o dptr
-movx @dptr,a			;envia 08h, habilitando o display D30 
-mov a,R2
-mov dptr, #tabela
-movc a,@a+dptr ;envia dados para o display
-mov dptr,#DADOS_DISPLAY	;envia o dados para display para dptr 
-movx @dptr,a			;envia o valor do acumulador para display
-clr a
-call TEMPO
-mov a,#01h				;ativa display das dezenas (D20)
-mov dptr,#EN_DIPSLAY	;envia endereco de habilitacao do display para o dptr
-movx @dptr,a			;envia 04h, habilitando o display D20 
-mov a,R3
-mov dptr, #tabela
-movc a,@a+dptr ;envia dados para o display
-mov dptr,#DADOS_DISPLAY	;envia o dados para display para dptr 
-movx @dptr,a			;envia o valor do acumulador para display
-clr a
+DISPLAY:
+    CLR A
+    MOV A,#08H				;ativa display das unidade (D30)
+    MOV DPTR,#EN_DIPSLAY	;envia endereco de habilitacao do display para o dptr
+    MOVX @DPTR,A			;envia 08h, habilitando o display D30 
+    MOV A,R0
+    MOV DPTR, #tabela
+    MOVC A,@A+DPTR ;envia dados para o display
+    MOV DPTR,#DADOS_DISPLAY	;envia o dados para display para dptr 
+    MOVX @DPTR,A			;envia o valor do acumulador para display
+    CLR A
+    CALL TEMPO
+    MOV A,#04H				;ativa display das dezenas (D20)
+    MOV DPTR,#EN_DIPSLAY	;envia endereco de habilitacao do display para o dptr
+    MOVX @DPTR,A			;envia 04h, habilitando o display D20 
+    MOV A,R1
+    MOV DPTR, #tabela
+    MOVC A,@A+DPTR ;envia dados para o display
+    MOV DPTR,#DADOS_DISPLAY	;envia o dados para display para dptr 
+    MOVX @DPTR,A			;envia o valor do acumulador para display
+    CLR A
+    CALL TEMPO
+    CLR A
+    MOV A,#02H				;ativa display das unidade (D30)
+    MOV DPTR,#EN_DIPSLAY	;envia endereco de habilitacao do display para o dptr
+    MOVX @DPTR,A			;envia 08h, habilitando o display D30 
+    MOV A,R2
+    MOV DPTR, #tabela
+    MOVC A,@A+DPTR ;envia dados para o display
+    MOV DPTR,#DADOS_DISPLAY	;envia o dados para display para dptr 
+    MOVX @DPTR,A			;envia o valor do acumulador para display
+    CLR A
+    call TEMPO
+    MOV A,#01H				;ativa display das dezenas (D20)
+    MOV DPTR,#EN_DIPSLAY	;envia endereco de habilitacao do display para o dptr
+    MOVX @DPTR,A			;envia 04h, habilitando o display D20 
+    MOV A,R3
+    MOV DPTR, #tabela
+    MOVC A,@A+DPTR ;envia dados para o display
+    MOV DPTR,#DADOS_DISPLAY	;envia o dados para display para dptr 
+    MOVX @DPTR,A			;envia o valor do acumulador para display
+    CLR A
 
-CALL TEMPO
-CALL TECLADO_READ
+    CALL TEMPO
+    CALL TECLADO_READ
 
-MOV A,#80H ;Ativar a linha 7
-MOV DPTR,#TECLADO
-MOVX @DPTR,A
-MOVX A,@DPTR
-CJNE A,#40H, display ; Pressionou tecla "0"?
-CALL TECLADO_SAIR
-MOV DISP0, R0
-MOV DISP1, R1
-MOV DISP2, R2
-MOV DISP3, R3
-
-
+    MOV A,#80H ;Ativar a linha 7
+    MOV DPTR,#TECLADO
+    MOVX @DPTR,A
+    MOVX A,@DPTR
+    CJNE A,#40H, display ; Pressionou tecla "0"?
+    CALL TECLADO_SAIR
+    MOV DISP0, R0
+    MOV DISP1, R1
+    MOV DISP2, R2
+    MOV DISP3, R3
 
 
-jmp display
+
+
+    JMP DISPLAY
 
 TEMPO:		;rotina de tempo(20x50.000)
     ;MOV R0,#2
@@ -255,8 +255,8 @@ TEMPO2:		;rotina de tempo(20x50.000)
     ;DJNZ R0,LOOP
     RET
 
-tabela:
+TABELA:
 	; 0	  1	  2	  3   4   5   6   7   8   9   A   B   C   D   E   F
-db	 3fh,06h,5bh,4fh,66h,6dh,7dh,07h,7fh,67h,77h,7ch,39h,5eh,79h,71h
+db	 3fH,06H,5bH,4fH,66H,6dH,7dH,07H,7fH,67H,77H,7cH,39H,5eH,79H,71H
 
 END
