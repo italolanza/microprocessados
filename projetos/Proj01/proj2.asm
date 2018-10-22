@@ -215,17 +215,118 @@ DISPLAY:
     MOV DPTR,#TECLADO
     MOVX @DPTR,A
     MOVX A,@DPTR
-    CJNE A,#40H, display ; Pressionou tecla "0"?
+    CJNE A,#40H, DISPLAY ; Pressionou tecla "0"?
     CALL TECLADO_SAIR
+    CALL INCREMENTA
+
+
+
+    JMP DISPLAY
+
+INCREMENTA:
+ 
     MOV DISP0, R0
     MOV DISP1, R1
     MOV DISP2, R2
     MOV DISP3, R3
 
+    MOV R0,#0H
+    MOV R1,#0H
+    MOV R2,#0H
+    MOV R3,#0H
 
+CONTAGEM:
 
+    CLR A
+    MOV A,#08H				;ativa display das unidade (D30)
+    MOV DPTR,#EN_DIPSLAY	;envia endereco de habilitacao do display para o dptr
+    MOVX @DPTR,A			;envia 08h, habilitando o display D30 
+    MOV A,R0
+    MOV DPTR, #tabela
+    MOVC A,@A+DPTR ;envia dados para o display
+    MOV DPTR,#DADOS_DISPLAY	;envia o dados para display para dptr 
+    MOVX @DPTR,A			;envia o valor do acumulador para display
+    CLR A
+    CALL TEMPO
+    MOV A,#04H				;ativa display das dezenas (D20)
+    MOV DPTR,#EN_DIPSLAY	;envia endereco de habilitacao do display para o dptr
+    MOVX @DPTR,A			;envia 04h, habilitando o display D20 
+    MOV A,R1
+    MOV DPTR, #tabela
+    MOVC A,@A+DPTR ;envia dados para o display
+    MOV DPTR,#DADOS_DISPLAY	;envia o dados para display para dptr 
+    MOVX @DPTR,A			;envia o valor do acumulador para display
+    CLR A
+    CALL TEMPO
+    CLR A
+    MOV A,#02H				;ativa display das unidade (D30)
+    MOV DPTR,#EN_DIPSLAY	;envia endereco de habilitacao do display para o dptr
+    MOVX @DPTR,A			;envia 08h, habilitando o display D30 
+    MOV A,R2
+    MOV DPTR, #tabela
+    MOVC A,@A+DPTR ;envia dados para o display
+    MOV DPTR,#DADOS_DISPLAY	;envia o dados para display para dptr 
+    MOVX @DPTR,A			;envia o valor do acumulador para display
+    CLR A
+    call TEMPO
+    MOV A,#01H				;ativa display das dezenas (D20)
+    MOV DPTR,#EN_DIPSLAY	;envia endereco de habilitacao do display para o dptr
+    MOVX @DPTR,A			;envia 04h, habilitando o display D20 
+    MOV A,R3
+    MOV DPTR, #tabela
+    MOVC A,@A+DPTR ;envia dados para o display
+    MOV DPTR,#DADOS_DISPLAY	;envia o dados para display para dptr 
+    MOVX @DPTR,A			;envia o valor do acumulador para display
+    CLR A
 
-    JMP DISPLAY
+    CJNE R3, #DISP3, VERIFICA_9_UNIDADE
+    JMP VERIFICA_DEZENA
+
+VERIFICA_9_UNIDADE:
+    CJNE R0, #9, INCREMENTA_UNIDADE
+    MOV R0, #0
+    JMP VERIFICA_DEZENA
+
+INCREMENTA_UNIDADE:
+    INC R0
+    JMP VERIFICA_DEZENA
+
+VERIFICA_DEZENA:
+    CJNE R1, #DISP1, VERIFICA_9_DEZENA
+    JMP VERIFICA_DEZENA
+
+VERIFICA_9_DEZENA:
+    CJNE R1, #9, INCREMENTA_DEZENA
+    MOV R1, #0
+    JMP VERIFICA_CENTENA
+
+INCREMENTA_DEZENA:
+    INC R1
+    JMP VERIFICA_CENTENA
+
+VERIFICA_CENTENA:
+    CJNE R2, #DISP2, VERIFICA_9_CENTENA
+    JMP VERIFICA_MILHAR
+
+VERIFICA_9_CENTENA:
+    CJNE R2, #9, INCREMENTA_CENTENA
+    MOV R2, #0
+    JMP VERIFICA_MILHAR
+
+INCREMENTA_CENTENA:
+    INC R2
+    JMP VERIFICA_MILHAR
+
+VERIFICA_MILHAR:
+    CJNE R3, #DISP2, INCREMENTA_MILHAR
+    RET
+
+INCREMENTA_MILHAR:
+    INC R3
+    JMP CONTAGEM
+
+INC
+
 
 TEMPO:		;rotina de tempo(20x50.000)
     ;MOV R0,#2
