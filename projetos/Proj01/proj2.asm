@@ -171,7 +171,7 @@ DISPLAY:
     MOV DPTR,#EN_DIPSLAY	;envia endereco de habilitacao do display para o dptr
     MOVX @DPTR,A			;envia 08h, habilitando o display D30 
     MOV A,R0
-    MOV DPTR, #tabela
+    MOV DPTR, #TABELA
     MOVC A,@A+DPTR ;envia dados para o display
     MOV DPTR,#DADOS_DISPLAY	;envia o dados para display para dptr 
     MOVX @DPTR,A			;envia o valor do acumulador para display
@@ -181,7 +181,7 @@ DISPLAY:
     MOV DPTR,#EN_DIPSLAY	;envia endereco de habilitacao do display para o dptr
     MOVX @DPTR,A			;envia 04h, habilitando o display D20 
     MOV A,R1
-    MOV DPTR, #tabela
+    MOV DPTR, #TABELA
     MOVC A,@A+DPTR ;envia dados para o display
     MOV DPTR,#DADOS_DISPLAY	;envia o dados para display para dptr 
     MOVX @DPTR,A			;envia o valor do acumulador para display
@@ -192,7 +192,7 @@ DISPLAY:
     MOV DPTR,#EN_DIPSLAY	;envia endereco de habilitacao do display para o dptr
     MOVX @DPTR,A			;envia 08h, habilitando o display D30 
     MOV A,R2
-    MOV DPTR, #tabela
+    MOV DPTR, #TABELA
     MOVC A,@A+DPTR ;envia dados para o display
     MOV DPTR,#DADOS_DISPLAY	;envia o dados para display para dptr 
     MOVX @DPTR,A			;envia o valor do acumulador para display
@@ -202,7 +202,7 @@ DISPLAY:
     MOV DPTR,#EN_DIPSLAY	;envia endereco de habilitacao do display para o dptr
     MOVX @DPTR,A			;envia 04h, habilitando o display D20 
     MOV A,R3
-    MOV DPTR, #tabela
+    MOV DPTR, #TABELA
     MOVC A,@A+DPTR ;envia dados para o display
     MOV DPTR,#DADOS_DISPLAY	;envia o dados para display para dptr 
     MOVX @DPTR,A			;envia o valor do acumulador para display
@@ -215,7 +215,7 @@ DISPLAY:
     MOV DPTR,#TECLADO
     MOVX @DPTR,A
     MOVX A,@DPTR
-    CJNE A,#40H, DISPLAY ; Pressionou tecla "0"?
+    CJNE A,#40H, DISPLAY ; Pressionou tecla "="?
     CALL TECLADO_SAIR
     CALL INCREMENTA
 
@@ -242,7 +242,7 @@ CONTAGEM:
     MOV DPTR,#EN_DIPSLAY	;envia endereco de habilitacao do display para o dptr
     MOVX @DPTR,A			;envia 08h, habilitando o display D30 
     MOV A,R0
-    MOV DPTR, #tabela
+    MOV DPTR, #TABELA
     MOVC A,@A+DPTR ;envia dados para o display
     MOV DPTR,#DADOS_DISPLAY	;envia o dados para display para dptr 
     MOVX @DPTR,A			;envia o valor do acumulador para display
@@ -252,7 +252,7 @@ CONTAGEM:
     MOV DPTR,#EN_DIPSLAY	;envia endereco de habilitacao do display para o dptr
     MOVX @DPTR,A			;envia 04h, habilitando o display D20 
     MOV A,R1
-    MOV DPTR, #tabela
+    MOV DPTR, #TABELA
     MOVC A,@A+DPTR ;envia dados para o display
     MOV DPTR,#DADOS_DISPLAY	;envia o dados para display para dptr 
     MOVX @DPTR,A			;envia o valor do acumulador para display
@@ -263,7 +263,7 @@ CONTAGEM:
     MOV DPTR,#EN_DIPSLAY	;envia endereco de habilitacao do display para o dptr
     MOVX @DPTR,A			;envia 08h, habilitando o display D30 
     MOV A,R2
-    MOV DPTR, #tabela
+    MOV DPTR, #TABELA
     MOVC A,@A+DPTR ;envia dados para o display
     MOV DPTR,#DADOS_DISPLAY	;envia o dados para display para dptr 
     MOVX @DPTR,A			;envia o valor do acumulador para display
@@ -273,13 +273,13 @@ CONTAGEM:
     MOV DPTR,#EN_DIPSLAY	;envia endereco de habilitacao do display para o dptr
     MOVX @DPTR,A			;envia 04h, habilitando o display D20 
     MOV A,R3
-    MOV DPTR, #tabela
+    MOV DPTR, #TABELA
     MOVC A,@A+DPTR ;envia dados para o display
     MOV DPTR,#DADOS_DISPLAY	;envia o dados para display para dptr 
     MOVX @DPTR,A			;envia o valor do acumulador para display
     CLR A
 
-    CJNE R3, #DISP3, VERIFICA_9_UNIDADE
+    CJNE R0, #DISP0, VERIFICA_9_UNIDADE
     JMP VERIFICA_DEZENA
 
 VERIFICA_9_UNIDADE:
@@ -324,8 +324,6 @@ VERIFICA_MILHAR:
 INCREMENTA_MILHAR:
     INC R3
     JMP CONTAGEM
-
-INC
 
 
 TEMPO:		;rotina de tempo(20x50.000)
