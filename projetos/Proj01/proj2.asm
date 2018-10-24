@@ -1,5 +1,5 @@
 TEMP EQU (65535 - 2000)
-TEMP1S EQU (65535 - 20000)
+TEMP1S EQU (65535 - 50000)
 TECLADO equ 0FFE3H
 MOTOR equ 0FFE6H
 TECLAAUX equ 11H
@@ -230,13 +230,13 @@ INCREMENTA:
     MOV DISP2, R2
     MOV DISP3, R3
 
-    MOV R0,#0H
-    MOV R1,#0H
-    MOV R2,#0H
-    MOV R3,#0H
+    MOV R0,#0
+    MOV R1,#0
+    MOV R2,#0
+    MOV R3,#0
 
 CONTAGEM:
-
+CALL TEMPO2
     CLR A
     MOV A,#08H				;ativa display das unidade (D30)
     MOV DPTR,#EN_DIPSLAY	;envia endereco de habilitacao do display para o dptr
@@ -268,7 +268,7 @@ CONTAGEM:
     MOV DPTR,#DADOS_DISPLAY	;envia o dados para display para dptr 
     MOVX @DPTR,A			;envia o valor do acumulador para display
     CLR A
-    call TEMPO
+    CALL TEMPO
     MOV A,#01H				;ativa display das dezenas (D20)
     MOV DPTR,#EN_DIPSLAY	;envia endereco de habilitacao do display para o dptr
     MOVX @DPTR,A			;envia 04h, habilitando o display D20 
@@ -278,6 +278,7 @@ CONTAGEM:
     MOV DPTR,#DADOS_DISPLAY	;envia o dados para display para dptr 
     MOVX @DPTR,A			;envia o valor do acumulador para display
     CLR A
+    CALL TEMPO
 
     CJNE R3, #DISP3, VERIFICA_9_UNIDADE
     CJNE R2, #DISP2, VERIFICA_9_UNIDADE
@@ -338,9 +339,9 @@ TEMPO:		;rotina de tempo(20x50.000)
     RET
     
 TEMPO2:		;rotina de tempo(20x50.000)
-    ;MOV R0,#2
+    MOV R5,#2
 
-    ;LOOP:
+    LOOP2:
     MOV TMOD,#00000001B
     MOV TL0,#LOW(TEMP1S)
     MOV TH0,#HIGH(TEMP1S)
@@ -348,7 +349,7 @@ TEMPO2:		;rotina de tempo(20x50.000)
     JNB TF0,$
     CLR TR0
     CLR TF0
-    ;DJNZ R0,LOOP
+    DJNZ R5,LOOP2
     RET
 
 TABELA:
