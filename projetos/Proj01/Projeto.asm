@@ -10,17 +10,7 @@ DISP1 EQU 40H
 DISP2 EQU 50H
 DISP3 EQU 60H
 
-;DISP0C EQU 34H
-;DISP1C EQU 35H
-;DISP2C EQU 36H
-;DISP3C EQU 37H
-
 ORG 0h
-
-;MOV DISP0, #10H
-;MOV a, DISP0;
-;CJNE a, DISP0, INICIO
-;MOV DISP0, #20H
 
 INICIO:
     CLR A ; Limpando A
@@ -34,8 +24,6 @@ INICIO:
     MOV R3, #0
     MOV R6, #0
     CALL DISPLAY
-;    LJMP TECLADO_READ
-    ;AJMP LOOP
 
 ;Inicia a varredura do teclado
 TECLADO_READ:
@@ -85,10 +73,6 @@ TECLADO_READ:
     MOV R0, A
     LJMP TECLADO_SAIR
 
-    ;TR8: CJNE A,#02H,TR9_A ; Pressionou tecla "B"?
-    ;MOV P1,#0BH
-    ;LJMP TECLADO_SAIR
-
     TR9_A: CJNE A,#06H,TR9_B
     MOV A,#TECLAAUX
     LJMP TECLADO_SAIR
@@ -127,13 +111,9 @@ TECLADO_READ:
     LJMP TECLADO_SAIR
 
     TR17: LJMP TECLADO_SAIR
-;    CJNE R1, #00000000, TECLADO_READ
-    ; aqui devo fazer o display apareceer o numero
     RET
-;    LJMP TECLADO_READ
 
-    ;Esta rotina evita repetic¸a~o de teclas
-    
+;Esta rotina evita repetic¸a~o de teclas  
 TECLADO_SAIR:
     PUSH ACC
     MOV A,#80H
@@ -154,14 +134,7 @@ TECLADO_SAIR:
     CJNE A,#00H,TECLADO_REPEAT_2
     POP ACC
     
-;    CALL DECREMENTA
-    
     RET
-    
-;DECREMENTA:
-;	DJNZ R0, DECREMENTA
-;	CALL TEMPO2
-;	RET
     
 ATUALIZA_DISPLAY:
     MOV A, R2
@@ -293,11 +266,9 @@ CALL TEMPO2
     
     MOV A, R2
     CJNE A, DISP2, VERIFICA_9_UNIDADE
-    ;DEC R2
     
     MOV A, R1
     CJNE A, DISP1, VERIFICA_9_UNIDADE
-    ;DEC R1
     
     MOV A, R0
     CJNE A, DISP0, VERIFICA_9_UNIDADE
@@ -339,10 +310,8 @@ INCREMENTA_MILHAR:
     JMP CONTAGEM
 
 
-TEMPO:		;rotina de tempo(20x50.000)
-    ;MOV R0,#2
+TEMPO:		;rotina de tempo(2000us)
 
-    LOOP:
     MOV TMOD,#00000001B
     MOV TL0,#LOW(TEMP)
     MOV TH0,#HIGH(TEMP)
@@ -353,10 +322,10 @@ TEMPO:		;rotina de tempo(20x50.000)
     ;DJNZ R0,LOOP
     RET
     
-TEMPO2:		;rotina de tempo(20x50.000)
+TEMPO2:		;rotina de tempo(20x50.000us)
     MOV R5,#2
 
-    LOOP2:
+    LOOP:
     MOV TMOD,#00000001B
     MOV TL0,#LOW(TEMP1S)
     MOV TH0,#HIGH(TEMP1S)
@@ -364,7 +333,7 @@ TEMPO2:		;rotina de tempo(20x50.000)
     JNB TF0,$
     CLR TR0
     CLR TF0
-    DJNZ R5,LOOP2
+    DJNZ R5,LOOP
     RET
 
 TABELA:
