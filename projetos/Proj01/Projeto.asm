@@ -1,5 +1,5 @@
-TEMP EQU (65535 - 2000)
-TEMP1S EQU (65535 - 50000)
+TEMP EQU (65535 - 4250)
+TEMP1S EQU (65535 - 4000)
 TECLADO equ 0FFE3H
 MOTOR equ 0FFE6H
 TECLAAUX equ 11H
@@ -178,7 +178,7 @@ DISPLAY:
     MOV DPTR,#DADOS_DISPLAY	;envia o dados para display para dptr 
     MOVX @DPTR,A			;envia o valor do acumulador para display
     CLR A
-    call TEMPO
+    CALL TEMPO
     MOV A,#01H				;ativa display das dezenas (D20)
     MOV DPTR,#EN_DIPSLAY	;envia endereco de habilitacao do display para o dptr
     MOVX @DPTR,A			;envia 04h, habilitando o display D20 
@@ -193,13 +193,14 @@ DISPLAY:
     CALL TECLADO_READ
 
     MOV A,#80H ;Ativar a linha 7
+    CALL TEMPO2
     MOV DPTR,#TECLADO
     MOVX @DPTR,A
     MOVX A,@DPTR
     CJNE A,#40H, DISPLAY ; Pressionou tecla "="?
     CALL TECLADO_SAIR
     CALL INCREMENTA
-
+    
 
 
     JMP DISPLAY
@@ -215,9 +216,10 @@ INCREMENTA:
     MOV R1,#0				;; ZEROU OS REGISTRADORES
     MOV R2,#0				;; ZEROU OS REGISTRADORES
     MOV R3,#0				;; ZEROU OS REGISTRADORES
+    MOV R7,#10
 
 CONTAGEM:
-CALL TEMPO2
+    ;CALL TEMPO2
     CLR A
     MOV A,#08H				;ativa display das unidade (D30)
     MOV DPTR,#EN_DIPSLAY	;envia endereco de habilitacao do display para o dptr
@@ -260,7 +262,8 @@ CALL TEMPO2
     MOVX @DPTR,A			;envia o valor do acumulador para display
     CLR A
     CALL TEMPO
-
+    DJNZ R7, CONTAGEM
+    
     MOV A, R3
     CJNE A, DISP3, VERIFICA_9_UNIDADE
     
@@ -277,10 +280,12 @@ CALL TEMPO2
 VERIFICA_9_UNIDADE:
     CJNE R0, #9, INCREMENTA_UNIDADE
     MOV R0, #0
+    MOV R7,#10
     JMP VERIFICA_9_DEZENA
 
 INCREMENTA_UNIDADE:
     INC R0
+    MOV R7,#10
     JMP CONTAGEM
 
 VERIFICA_9_DEZENA:
@@ -323,7 +328,7 @@ TEMPO:		;rotina de tempo(2000us)
     RET
     
 TEMPO2:		;rotina de tempo(20x50.000us)
-    MOV R5,#2
+    MOV R5,#1
 
     LOOP:
     MOV TMOD,#00000001B
