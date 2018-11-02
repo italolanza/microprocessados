@@ -1,0 +1,110 @@
+DISPLAY_IR equ 0FFC2H ;escrita inst.
+DISPLAY_DR equ 0FFD2H ;escrita dado
+DISPLAY_BF equ 0FFE2H ;leitura inst.
+DISPLAY_R equ 0FFF2H ;leitura dado
+TEMP EQU (65535 - 50000)
+
+ORG 0000h
+
+INICIO:
+CLR P1.0 ;Apagando os leds do portal P1
+CLR P1.1 ;Apagando os leds do portal P1
+CLR P1.2 ;Apagando os leds do portal P1
+CLR P1.3 ;Apagando os leds do portal P1
+MOV R0,#80H
+
+MAIN:
+ACALL DISPLAY_INICIA ; Rotina de inicialização Display
+ACALL DISPLAY_RETURN ; Posiciona o cursor na primeira coluna, primeira linha do LCD
+CLR A ; Limpando A
+MOV DPTR,#sAD ; Indicando o end. inicial do texto para o LCD
+ACALL DISPLAY_WRITESTR ; Escrever texto no display
+
+JMP MAIN
+
+DISPLAY_INICIA:
+PUSH ACC
+ACALL DISPLAY_BUSY
+
+MOV DPTR,#DISPLAY_IR
+MOV A,#38H ;Function set dl=1 (8bits) N=1(duas linhas)
+MOVX @DPTR,A
+ACALL DISPLAY_BUSY
+MOV DPTR,#DISPLAY_IR
+MOV A,#06H ;Entry mode set I/D=1(incr.)S=0 (nao desl)
+MOVX @DPTR,A
+ACALL DISPLAY_BUSY
+MOV DPTR,#DISPLAY_IR
+MOV A,#0CH ;Display ON/OFF D=1(display)C=0(cursor)B=0(sem blink)
+MOVX @DPTR,A
+POP ACC
+RET
+
+DISPLAY_BUSY:
+MOV DPTR,#DISPLAY_BF ;Verifica se o Display está ocupado
+MOVX A,@DPTR
+JB ACC.7, DISPLAY_BUSY
+RET
+
+DISPLAY_RETURN: ;Retorna o display para o endereço de memória 0
+PUSH ACC
+ACALL DISPLAY_BUSY
+MOV DPTR,#DISPLAY_IR
+MOV A,R0
+MOVX @DPTR,A
+POP ACC
+INC R0
+ACALL TEMPO
+RET
+
+CLEAR_DISPLAY:
+PUSH ACC
+ACALL DISPLAY_BUSY
+MOV DPTR,#DISPLAY_IR
+MOV A,R1
+MOVX @DPTR,A
+POP ACC
+MOV DPTR,#' '
+ACALL DISPLAY_WRITECHAR
+RET
+
+DISPLAY_WRITECHAR:
+PUSH ACC ;Escreve um caracter no display
+ACALL DISPLAY_BUSY
+MOV DPTR,#DISPLAY_DR
+POP ACC
+MOVX @DPTR,A
+RET
+
+DISPLAY_WRITESTR: ;Escreve uma String no display
+CLR A
+MOVC A,@A+DPTR
+WRITESTR2:
+PUSH DPL
+PUSH DPH
+ACALL DISPLAY_WRITECHAR
+POP DPH
+POP DPL
+INC DPTR
+CLR A
+;ACALL CLEAR_DISPLAY
+MOVC A,@A+DPTR
+CJNE A,#00,WRITESTR2
+RET
+
+TEMPO:		;rotina de tempo(2000us)
+    MOV R5,#20
+LOOP:
+    MOV TMOD,#00000001B
+    MOV TL0,#LOW(TEMP)
+    MOV TH0,#HIGH(TEMP)
+    SETB TR0
+    JNB TF0,$
+    CLR TR0
+    CLR TF0
+    DJNZ R5,LOOP
+    RET
+
+sAD: db 'Display LCD',00
+
+END
