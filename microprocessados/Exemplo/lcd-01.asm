@@ -1,7 +1,7 @@
-DISPLAY_IR equ 0FFC2H ;escrita inst.
-DISPLAY_DR equ 0FFD2H ;escrita dado
-DISPLAY_BF equ 0FFE2H ;leitura inst.
-DISPLAY_R equ 0FFF2H ;leitura dado
+DISPLAY_IR equ FFC2H ;escrita inst. 
+DISPLAY_DR equ FFD2H ;escrita dado 1111 1111 1101 0010
+DISPLAY_BF equ FFE2H ;leitura inst. 
+DISPLAY_R equ FFF2H ;leitura dado 1000 0000
 TEMP EQU (65535 - 50000)
 
 ORG 0000h
@@ -11,7 +11,7 @@ CLR P1.0 ;Apagando os leds do portal P1
 CLR P1.1 ;Apagando os leds do portal P1
 CLR P1.2 ;Apagando os leds do portal P1
 CLR P1.3 ;Apagando os leds do portal P1
-MOV R0,#80H
+MOV R0,#80H ; 1000 0000
 
 MAIN:
 ACALL DISPLAY_INICIA ; Rotina de inicialização Display
@@ -27,7 +27,7 @@ PUSH ACC
 ACALL DISPLAY_BUSY
 
 MOV DPTR,#DISPLAY_IR
-MOV A,#38H ;Function set dl=1 (8bits) N=1(duas linhas)
+MOV A,#38H ;Function set dl=1 (8bits) N=1(duas linhas) 00111000
 MOVX @DPTR,A
 ACALL DISPLAY_BUSY
 MOV DPTR,#DISPLAY_IR
