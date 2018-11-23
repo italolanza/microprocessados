@@ -10,6 +10,8 @@ DISPLAY_CONFIGURACAO_DISPLAY EQU 0CH; configura on/off contro
 DISPLAY_POS_INICIAL equ 80H ; posicao inical da memoria DDRAM do display (ou posicao zero do cursor)
 TECLAAUX equ 11H
 TECLADO equ 0FFE3H
+LER_AD EQU 0FFC5H
+AD EQU 50H
 MOTOR equ 0FFE6H
 
 
@@ -147,6 +149,18 @@ TECLADO_SAIR:
     POP ACC
     
     RET
+    
+AD_READER:
+	PUSH ACC
+	MOV A,#40H
+    	MOV DPTR,#LER_AD
+    	MOVX @DPTR,A
+    	ACALL TEMPO
+    	MOVX A,@DPTR
+    	MOV AD, A
+    	MOV P1, AD
+	POP ACC
+	RET
 	
 WRITE_CHAR:
 	;MOV A, #'A'
@@ -204,6 +218,7 @@ ANIMATION:
 	MOV A,#'A'
 	MOV R0,#0
 WRITESTR2:
+	ACALL AD_READER
 	ACALL TECLADO_READ
 	ACALL TEMPO2
 	;MOV DPTR, #0
@@ -244,7 +259,7 @@ LOOP:
     RET
     
 TEMPO2:		;rotina de tempo(2000us)
-    MOV R1, #5
+    MOV R1, AD
 LOOP1:
     MOV TMOD,#00000001B
     MOV TL0,#LOW(TEMP1)
