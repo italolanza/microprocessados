@@ -8,6 +8,8 @@ DISPLAY_CONFIGURACAO equ 038H ; configura o display pra funcionar com 8 bits, us
 DIPSPLAY_CONFIGURACAO_ENTRY_MODE EQU 06H; configura o entry mode do display
 DISPLAY_CONFIGURACAO_DISPLAY EQU 0CH; configura on/off contro
 DISPLAY_POS_INICIAL equ 80H ; posicao inical da memoria DDRAM do display (ou posicao zero do cursor)
+TECLAAUX equ 11H
+TECLADO equ 0FFE3H
 MOTOR equ 0FFE6H
 
 
@@ -34,7 +36,89 @@ Init_DISPAY:
 	MOVX @DPTR, A
 	ACALL DISPLAY_BUSY
 	
-	LJMP ANIMATION 
+	LJMP ANIMATION
+	
+TRAVA:
+    ACALL TEMPO3
+    MOV A,#40H
+    MOV DPTR,#TECLADO
+    MOVX @DPTR,A
+    MOVX A,@DPTR
+    CJNE A,#01H,TRAVA; Pressionou tecla "1"?
+    RET
+    
+TRAVA2:
+    INC R0
+    ACALL WRITE_CHAR
+    ACALL TEMPO3
+TRAVA_V:
+    MOV A,#40H
+    MOV DPTR,#TECLADO
+    MOVX @DPTR,A
+    MOVX A,@DPTR
+    CJNE A,#01H,INCREMENTA; Pressionou tecla "1"?
+    RET
+    
+INCREMENTA:
+   CJNE R0, #16, VERIFICA_INC
+   MOV R0,#0
+   
+VERIFICA_INC:
+   CJNE A,#02H, TRAVA_V
+   LJMP TRAVA2
+	
+TECLADO_READ:
+    MOV A,#40H
+    MOV DPTR,#TECLADO
+    MOVX @DPTR,A
+    MOVX A,@DPTR
+    CJNE A,#01H,TRT2; Pressionou tecla "1"?
+    ACALL TRAVA
+    LJMP TECLADO_SAIR
+
+    TRT2: CJNE A,#02H,TR3 ; Pressionou tecla "2"?
+    ACALL TRAVA2
+    LJMP TECLADO_SAIR
+
+    TR3: CJNE A,#04H,TR5 ; Pressionou tecla "3"?
+    MOV R6,#03H
+    ;CALL ATUALIZA_DISPLAY
+    MOV A, R6
+    MOV R0, A
+    LJMP TECLADO_SAIR
+
+    TR5: CJNE A,#10H,TR6 ; Pressionou tecla "4"?
+    MOV R6,#04H
+    ;CALL ATUALIZA_DISPLAY
+    MOV A, R6
+    MOV R0, A
+    LJMP TECLADO_SAIR
+    
+    TR6: LJMP TECLADO_SAIR
+    RET
+    
+;Esta rotina evita repetic¸a~o de teclas  
+TECLADO_SAIR:
+    PUSH ACC
+    MOV A,#80H
+    MOV DPTR,#TECLADO
+    MOVX @DPTR,A
+
+    TECLADO_REPEAT_1:
+    MOVX A,@DPTR
+    CJNE A,#00H,TECLADO_REPEAT_1
+
+    TECLADO_SAIR_2:
+    MOV A,#40H
+    MOV DPTR,#TECLADO
+    MOVX @DPTR,A
+    
+    TECLADO_REPEAT_2:
+    MOVX A,@DPTR
+    CJNE A,#00H,TECLADO_REPEAT_2
+    POP ACC
+    
+    RET
 	
 WRITE_CHAR:
 	ACALL DISPLAY_POS
@@ -91,6 +175,7 @@ ANIMATION:
 	MOV A,#'A'
 	MOV R0,#0
 WRITESTR2:
+	ACALL TECLADO_READ
 	ACALL TEMPO2
 	;MOV DPTR, #0
 ;	ACALL DISPLAY_CLEAR
@@ -140,6 +225,19 @@ LOOP1:
     CLR TR0
     CLR TF0
     DJNZ R1,LOOP1
+    RET
+    
+TEMPO3:		;rotina de tempo(2000us)
+    MOV R1, #2
+LOOP2:
+    MOV TMOD,#00000001B
+    MOV TL0,#LOW(TEMP1)
+    MOV TH0,#HIGH(TEMP1)
+    SETB TR0
+    JNB TF0,$
+    CLR TR0
+    CLR TF0
+    DJNZ R1,LOOP2
     RET
 	
 ;Cursor_Ps: db 00H, 01H, 02H, 03H, 04H, 05H, 06H, 07H, 08H, 09H, 0AH, 0BH, 0CH, 0DH, 0EH, 0FH, 40H, 41H, 42H, 43H, 44H, 45H, 46H, 47H, 48H, 49H, 4AH, 4BH, 4CH, 4DH, 4EH, 4FH, 10H, 11H, 12H, 13H, 14H, 15H, 16H, 17H, 18H, 19H, 1AH, 1BH, 1CH, 1DH, 1EH, 1FH, 50H, 51H, 52H, 53H, 54H, 55H, 56H, 57H, 58H, 59H, 5AH, 5BH, 5CH, 5DH, 5EH, 5FH
