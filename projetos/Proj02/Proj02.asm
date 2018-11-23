@@ -45,6 +45,7 @@ TRAVA:
     MOVX @DPTR,A
     MOVX A,@DPTR
     CJNE A,#01H,TRAVA; Pressionou tecla "1"?
+    ACALL TECLADO_SAIR
     RET
     
 TRAVA2:
@@ -58,6 +59,7 @@ TRAVA_V:
     MOVX @DPTR,A
     MOVX A,@DPTR
     CJNE A,#01H,INCREMENTA; Pressionou tecla "1"?
+    ACALL TECLADO_SAIR
     POP ACC
     RET
     
@@ -68,6 +70,7 @@ INCREMENTA:
    
 VERIFICA_INC:
    CJNE A,#02H, TRAVA_V
+   ACALL TECLADO_SAIR
    POP ACC
    LJMP TRAVA2
 	
@@ -76,11 +79,13 @@ TECLADO_READ:
     MOV DPTR,#TECLADO
     MOVX @DPTR,A
     MOVX A,@DPTR
-    CJNE A,#01H,TRT2; Pressionou tecla "1"?
+    CJNE A,#01H,TRT2; Pressionou tecla "1" para play/pause?
+    ACALL TECLADO_SAIR
     ACALL TRAVA
     LJMP TECLADO_SAIR
 
-    TRT2: CJNE A,#02H,TR3 ; Pressionou tecla "2"?
+    TRT2: CJNE A,#02H,TR3 ; Pressionou tecla "2" para avancar?
+    ACALL TECLADO_SAIR
     ACALL TRAVA2
     LJMP TECLADO_SAIR
 
